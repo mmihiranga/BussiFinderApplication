@@ -15,6 +15,16 @@ import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import { addNewBusiness } from './../features/business';
+import AlertDialogSlide from './AlertDialogSlide';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(
+    props,
+    ref,
+) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 
 const GetStarted = styled(Button)(() => ({
@@ -87,26 +97,103 @@ const BusinessTypePage = () => {
     const theme = useSelector((state) => state.theme);
     const classes = useStyles(theme);
     const [value, setValue] = React.useState('1');
+    const userInfo = useSelector((state) => state.user.userDetails);
+    const [open, setOpen] = React.useState(false);
+    const [titleBox, setTitleBox] = React.useState('');
+    const [contentBox, setContentBox] = React.useState('');
+    const [error, setError] = React.useState(false);
+    const [errorMsg, setErrorMsg] = React.useState("Error");
+
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
 
+    const handleCheckCount = () => {
+        if(userInfo?.predictionCount > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    const handleCheckLogin = () => {
+        console.log(userInfo.predictionCount ? true : false);
+        if(userInfo){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
     const navigateToHInputForm = () => {
-        console.log("first")
-        dispatch(addNewBusiness({ 'type': 'hotel' }))
-        navigate(`/inputHotel`);
+        if(!handleCheckLogin()){
+            setErrorMsg('Please login to continue');
+            handleError()
+        }
+        else if(handleCheckCount()){
+            dispatch(addNewBusiness({ 'type': 'hotel' }))
+            navigate(`/inputHotel`);
+        }else{
+            setTitleBox('You have already used your prediction count');
+            setContentBox('You can only use your prediction count once. Please contact us to get more prediction count.');
+            setOpen(true);
+        }
     }
     
     const navigateToRInputForm = () => {
-        dispatch(addNewBusiness({ 'type': 'restaurant' }))
-        navigate(`/inputHotel`)
+        if(!handleCheckLogin()){
+            setErrorMsg('Please login to continue');
+            handleError()
+        }
+        else if(handleCheckCount()){
+            dispatch(addNewBusiness({ 'type': 'restaurant' }))
+            navigate(`/inputHotel`)
+        }else{
+            setTitleBox('You have already used your prediction count');
+            setContentBox('You can only use your prediction count once. Please contact us to get more prediction count.');
+            setOpen(true);
+        }
+        
     }
 
     const navigateToLocationBasedPredic = () => {
-        dispatch(addNewBusiness({ 'type': 'locationBased' }))
-        navigate(`/locationBasedPredict`)
+        if(!handleCheckLogin()){
+            setErrorMsg('Please login to continue');
+            handleError()
+        }
+        else if(handleCheckCount()){
+            dispatch(addNewBusiness({ 'type': 'locationBased' }))
+            navigate(`/locationBasedPredict`)
+        }else{
+            setTitleBox('You have already used your prediction count');
+            setContentBox('You can only use your prediction count once. Please contact us to get more prediction count.');
+            setOpen(true);
+        }
     }
+
+    const handleConfirmDailog = (Confirm) => {
+        if(Confirm){
+            navigate(`/Pricing`);
+            setOpen(false);
+        }else{
+            navigate(`/`);
+            setOpen(false);
+        }
+        
+    }
+
+    const handleError = () => {
+        setError(true);
+    };
+    const handleCloseError = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setError(false);
+    }
+    
 return (
     <Box
         sx={{
@@ -122,6 +209,15 @@ return (
             boxSizing:'border-box',
         }}
     >   
+     <Snackbar open={error} autoHideDuration={6000} onClose={handleCloseError}>
+                <Alert onClose={handleCloseError} severity="error">{errorMsg}</Alert>
+</Snackbar>
+    <AlertDialogSlide  
+            open={open}
+            setOpen={setOpen}
+            title={titleBox}
+            content={contentBox}
+            handleConfirmDailog={handleConfirmDailog}/>
     <TabContext value={value}>
         <Box sx={{
             display:'flex',

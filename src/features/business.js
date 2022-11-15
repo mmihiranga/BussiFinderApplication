@@ -12,17 +12,7 @@ export const businessSlice = createSlice({
             state.value[0] = action.payload
         },
         addNewBusiness: (state, action) => {
-            let temp = []
-
-            for (let i = 0; i < state.value.length; i++) {
-                if (i == 0) {
-                    temp.push("")
-                }
-                temp.push(state.value[i])
-            }
-            // state.value.push(action.payload)
-            console.log("temppppppppppppppppppppppppppppppppppppppppppp", temp)
-            state.value = temp;
+            state.value = [];
             state.value[0] = action.payload
         },
         compareBusiness: (state, action) => {
@@ -37,8 +27,6 @@ export const businessSlice = createSlice({
                 }
                 temp.push(state.value[i])
             }
-            // state.value.push(action.payload)
-            // console.log("temppppppppppppppppppppppppppppppppppppppppppp", temp)
             state.value = temp;
             state.value[0] = action.payload
         },

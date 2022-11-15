@@ -65,10 +65,10 @@ const Footer = () => {
     let navigate = useNavigate();
     const headerVisibility = useSelector((state) => state.header)
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        console.log("headerVisibilityeee", headerVisibility.value)
-    }, [headerVisibility]);
+    //     console.log("headerVisibilityeee", headerVisibility.value)
+    // }, [headerVisibility]);
 
     return (
         <>

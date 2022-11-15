@@ -147,10 +147,7 @@ export default function SignIn() {
     const [error, setError] = React.useState(false);
     const [errorMsg, setErrorMsg] = React.useState("Error");
 
-    useEffect(() => {
-        console.log("userDetails", userDetails);
 
-    }, [userDetails]);
 
     useEffect(() => {
         function start() {
@@ -188,15 +185,16 @@ export default function SignIn() {
                 role: 'user',
                 emailToken: null,
                 isVerified: true,
-                predictionCount : 0,
-                predictionCountLimit : 0,
-                subscriptionType : 'none',
+                predictionCount : 5,
+                compareCount : 3,
+                locationPredictCount:10,
+                subscriptionType: 'Monthly',
                 paymentType: 'none',
                 paymentID: 'none',
-                subscriptionPlan: 'none',
-                subscriptionEndDate : 'none',
-                subscriptionDate : 'none',
-                subscriptionStatus : 'none',
+                subscriptionPlan: 'Free',
+                subscriptionEndDate : '15-12-2022',
+                subscriptionDate : '15-11-2022',
+                subscriptionStatus : 'Active',
 
             }
 
@@ -212,6 +210,7 @@ export default function SignIn() {
                                     console.log("result", result)
                                     let decodedToken = jwt_decode(result.data.user)
                                     localStorage.setItem('token', result.data.user)
+                                    localStorage.setItem('userInfo', JSON.stringify(result.data.userDetails))
                                     dispatch(login({ 'fullName': decodedToken.fullName, 'email': decodedToken.email }))
                                     dispatch(userInfo(result.data.userDetails))
                                     dispatch(addHeader({ 'header': true, 'footer': true }))
@@ -236,6 +235,7 @@ export default function SignIn() {
                             console.log("decodedToken", decodedToken)
 
                             localStorage.setItem('token', result.data.user)
+                            localStorage.setItem('userInfo', JSON.stringify(result.data.userDetails))
                             dispatch(login({ 'fullName': decodedToken.fullName, 'email': decodedToken.email }))
                             dispatch(userInfo(result.data.userDetails))
                             dispatch(addHeader({ 'header': true, 'footer': true }))
@@ -288,15 +288,14 @@ export default function SignIn() {
             const result = await API.post('user/validate', body)
             console.log("result", result)
             let decodedToken = jwt_decode(result.data.user)
-            console.log("decodedToken", decodedToken)
-
             localStorage.setItem('token', result.data.user)
+            localStorage.setItem('userInfo', JSON.stringify(result.data.userDetails))
             dispatch(login({ 'fullName': decodedToken.fullName, 'email': decodedToken.email }))
-            dispatch(userInfo(result.data.userDetails))
+            dispatch(userInfo(result.data?.userDetails))
             dispatch(addHeader({ 'header': true, 'footer': true }))
             navigate('/')
         } catch (error) {
-            console.log("errrrr",error)
+            console.log("error",error)
             setErrorMsg(error.response.data.message)
             handleError()
         }

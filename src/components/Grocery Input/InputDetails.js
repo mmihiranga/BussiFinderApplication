@@ -76,6 +76,9 @@ export default function InputDetails() {
         }
     }, [businessDetails]);
 
+const showTips = () =>{
+navigate(`/GroceryTips`) 
+}
     const handleNext = () => {
         setActiveStep(activeStep + 1);
         if (activeStep === steps.length - 1 && businessDetails && businessDetails.value[0].type == 'Grocery') {
@@ -85,13 +88,21 @@ export default function InputDetails() {
                 "longitude": businessDetails.value[0].longitude
             }
 
-            API.post('grocery/grocerycompetitor',body).then((competResult)=>{
-                const competitorsCount = competResult.data.CompetitorCount
+             API.post('grocery/grocerycompetitor',body).then((competResult)=>{
+                 const competitorsCount = competResult.data.CompetitorCount
                 
-                API.post('grocery/grocerytraffci',body).then((trafficResult)=>{
-                    const trafficSum = trafficResult.data.TraffciSummation
+                 API.post('grocery/grocerytraffci',body).then((trafficResult)=>{
+                    console.log("tree--->",trafficResult)
+                     var trafficSum;
+                     if(!trafficResult.data.TraffciSummation){
+                        trafficSum=0
+                     }
+                     else{
+                        trafficSum = trafficResult.data.TraffciSummation
+                     }
+                     
                 
-                    console.log("comp:",competitorsCount,"traffic:",trafficSum)
+                     console.log("comp:",competitorsCount,"traffic:",trafficSum)
 
                     let groceryModelReq = {
                                             "Trafficflow": trafficSum,
@@ -112,14 +123,22 @@ export default function InputDetails() {
                     let locationFeatures = {
                         trafficSum: trafficSum,
                         competitorsCount: competitorsCount,
+                        Instoreshopping:businessDetails.value[0].serviceDetails.shopping ? "available" : "unavalable",
+                        Delivery:businessDetails.value[0].serviceDetails.delivery ?"available" : "unavalable",
+                        Website:  businessDetails.value[0].serviceDetails.web ? "available" : "unavalable",
+                        Parking :businessDetails.value[0].serviceDetails.parking ?"available" : "unavalable"
                                          }
+                             console.log(groceryModelReq)            
                     axios.post(' http://127.0.0.1:5000/grocery', groceryModelReq)
                                                 .then(function (GroceryResult) {
                                                     console.log("Prediction", GroceryResult.data)
                                                     dispatch(addBusiness({
                                                     ...businessDetails.value[0], locationFeatures: locationFeatures, ml_result: GroceryResult.data.data
                                                     }))
-                                                    navigate(`/result`)
+                                                    if (businessDetails.value.length > 1) {
+                                                        navigate(`/multipleResultG`)
+                                                    }else{navigate(`/result`)}
+                                                    
                                                     handleClose()
                                                 }).catch((error)=>{
                                                     console.log("error:",error)
@@ -341,6 +360,13 @@ export default function InputDetails() {
                                         sx={{ mt: 3, ml: 1 }}
                                     >
                                         {activeStep === steps.length - 1 ? 'Proceed' : 'Next'}
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        onClick={showTips}
+                                        sx={{ mt: 3, ml: 1 }}
+                                    >
+                                        Tips
                                     </Button>
                                 </Box>
                             </React.Fragment>)}

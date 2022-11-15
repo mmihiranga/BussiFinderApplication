@@ -25,6 +25,15 @@ import { useNavigate } from "react-router-dom";
 import styled from '@emotion/styled';
 import { FillingBottle } from "react-cssfx-loading";
 import { TypeAnimation } from 'react-type-animation';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(
+    props,
+    ref,
+) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 
 const NextBtn = styled(Button)(() => ({
@@ -89,7 +98,10 @@ export default function InputDetails() {
     const [open, setOpen] = React.useState(false);
     const dispatch = useDispatch();
     const [activeStep, setActiveStep] = React.useState(0);
-    const businessDetails = useSelector((state) => state.business)
+    const businessDetails = useSelector((state) => state.business);
+    const userInfo = useSelector((state) => state.user.userDetails);
+    const [error, setError] = React.useState(false);
+    const [errorMsg, setErrorMsg] = React.useState("Error");
     let navigate = useNavigate();
     const handleClose = () => {
         setOpen(false);
@@ -113,7 +125,10 @@ export default function InputDetails() {
         }
     };
 
+    
+
     const handleNext = () => {
+        if(businessDetails.value[0].latitude && businessDetails.value[0].longitude){
         setActiveStep(activeStep + 1);
         if (activeStep === steps.length - 1 && businessDetails && businessDetails.value[0].type == 'hotel') {
             handleToggle()
@@ -273,16 +288,32 @@ export default function InputDetails() {
                 }).catch(function (error) { })
             }).catch(function (error) { });
         }
-
+    }else{
+        setErrorMsg('Please Select a Location');
+        handleError()
+    }
     };
 
     const handleBack = () => {
         setActiveStep(activeStep - 1);
     };
 
+    const handleError = () => {
+        setError(true);
+    };
+    const handleCloseError = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setError(false);
+    }
+
     return (
         <ThemeProvider theme={theme}>
             {/* <CssBaseline /> */}
+            <Snackbar open={error} autoHideDuration={6000} onClose={handleCloseError}>
+                <Alert onClose={handleCloseError} severity="error">{errorMsg}</Alert>
+</Snackbar>
             <Container component="main" maxWidth={activeStep == 0 ? "md" : "sm"} sx={{ p: 8 ,boxSizing:"border-box",}}>
                 <Paper variant="outlined" 
                 sx={{
@@ -356,7 +387,6 @@ export default function InputDetails() {
                                             repeat={Infinity}
                                             style={{ fontSize: '2em',color:"#101554" }}
                                             />
-                                       
                                     </Box>
                                 
                                 </React.Fragment>

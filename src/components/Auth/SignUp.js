@@ -106,10 +106,10 @@ export default function SignUp() {
         dispatch(addHeader({ 'header': false, 'footer': false }))
     }, []);
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        console.log("headerVisibilityeee", headerVisibility.value)
-    }, [headerVisibility]);
+    //     console.log("headerVisibilityeee", headerVisibility.value)
+    // }, [headerVisibility]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -125,15 +125,16 @@ export default function SignUp() {
             email: data.get('email'),
             password: data.get('password'),
             role: 'user',
-            predictionCount : 0,
-            predictionCountLimit : 0,
+            predictionCount : 5,
+            compareCount : 3,
+            locationPredictCount:10,
             paymentType: 'none',
             paymentID: 'none',
-            subscriptionPlan: 'none',
-            subscriptionType: 'none',
-            subscriptionEndDate : 'none',
-            subscriptionDate : 'none',
-            subscriptionStatus : 'none'
+            subscriptionType: 'Monthly',
+            subscriptionPlan: 'Free',
+            subscriptionEndDate : '15-12-2022',
+            subscriptionDate : '15-11-2022',
+            subscriptionStatus : 'Active',
         }
         try {
             const result = await API.post('user/create', body)

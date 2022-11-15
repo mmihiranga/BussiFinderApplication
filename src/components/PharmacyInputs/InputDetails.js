@@ -92,15 +92,16 @@ export default function InputDetails() {
 
             API.post('pharmacy/distanceToBStation', body).then((distanceToBusStationResult)=> {
                 console.log("inside distance to bus")
+                // let busStationDistance = "0";
                 let busStationDistance = distanceToBusStationResult.data.distance;
 
-                if(distanceToBusStationResult.data.distance === "undefined"){
-                    busStationDistance = "200";
-                }else{
-                    busStationDistance = distanceToBusStationResult.data.distance;
-                }
+                // if((busStationDistance === "0") || (busStationDistance === " ") ){
+                //     busStationDistance = "200";
+                // }else{
+                //     busStationDistance = distanceToBusStationResult.data.distance;
+                // }
                 
-                //console.log("bus distance",busStationDistance);
+                console.log("bus distance",busStationDistance);
 
                 let pharmacyObj = {
                     "medicalPlaces": medicalPlacesCount,
@@ -113,19 +114,30 @@ export default function InputDetails() {
                     "cardPay": businessDetails.value[0].serviceDetails.card ? 1 : 0,
                 }
 
-                let pharmacyLocationFeatures = {
+                let locationFeatures = {
                     medicalPlacesCount : medicalPlacesCount,
-                    busStationDistance : busStationDistance
+                    busStationDistance : busStationDistance,
+                    OpenHours : businessDetails.value[0].serviceDetails.open ? "Available" : "Unavailable",
+                    deliver : businessDetails.value[0].serviceDetails.deliver ? "Available" : "Unavailable",
+                    WhlChairEntrance : businessDetails.value[0].serviceDetails.whlentrence ? "Available" : "Unavailable",
+                    WhlChairPark: businessDetails.value[0].serviceDetails.whlpark ? "Available" : "Unavailable",
+                    cashPay: businessDetails.value[0].serviceDetails.cash ? "Available" : "Unavailable",
+                    cardPay: businessDetails.value[0].serviceDetails.card ? "Available" : "Unavailable",
                 }
 
                 axios.post('http://127.0.0.1:5000/pharmacy', pharmacyObj)
-                .then(function (ML_Result) {
-                console.log("Result Ml part ",ML_Result);
+                .then(function (PharmacyResult) {
+                console.log("RPrediction ",PharmacyResult.data);
                     dispatch(addBusiness({
-                        ...businessDetails.value[0], pharmacyLocationFeatures: pharmacyLocationFeatures, ml_result: ML_Result.data.data
+                        ...businessDetails.value[0], locationFeatures: locationFeatures, ml_result: PharmacyResult.data.data
                     }))
-                    navigate(`/result`)
-                    //handleClose()
+                    if (businessDetails.value.length > 1) {
+
+                        navigate(`/pmultipleResult`)
+
+                    }else{navigate(`/result`)}
+                    handleClose()
+
                 }).catch(function (error) {
                     return error;
                 });

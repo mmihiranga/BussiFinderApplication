@@ -11,7 +11,7 @@ import { addBusiness } from '../features/business';
 
 function Map() {
   const dispatch = useDispatch();
-  const businessDetails = useSelector((state) => state.business)
+  const businessDetails = useSelector((state) => state.business);
   const [mapRef, setMapRef] = useState(null);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [markerMap, setMarkerMap] = useState({});
@@ -19,8 +19,8 @@ function Map() {
   const [position, setPosition] = useState({});
   const [zoom, setZoom] = useState(9);
   const [clickedLatLng, setClickedLatLng] = useState({
-    lat: businessDetails && businessDetails.value[0].latitude ? businessDetails.value[0].latitude : '',
-    lng: businessDetails && businessDetails.value[0].longitude ? businessDetails.value[0].longitude : '',
+    lat:  businessDetails?.value[0]?.latitude ? businessDetails.value[0].latitude : '',
+    lng:  businessDetails?.value[0]?.longitude ? businessDetails.value[0].longitude : '',
   });
   const [infoOpen, setInfoOpen] = useState(false);
 
@@ -64,9 +64,8 @@ function Map() {
 
   useEffect(() => {
     if (clickedLatLng) {
-      console.log('sqqqqqqqqqqqqqqqqqqqq')
       setPosition(clickedLatLng)
-      console.log("clickedLatLng", clickedLatLng, businessDetails.value[0].type)
+      console.log("clickedLatLng", clickedLatLng, businessDetails.value[0]?.type)
       dispatch(addBusiness({
         ...businessDetails.value[0],
         latitude: clickedLatLng.lat,

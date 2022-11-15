@@ -20,7 +20,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import SystemUpdateAltRoundedIcon from '@mui/icons-material/SystemUpdateAltRounded';
 import { padding } from "@mui/system";
 import GaugeChart from 'react-gauge-chart'
-// import { Chart } from "react-google-charts";
+import { Chart } from "react-google-charts";
 // import { Bar } from 'react-chartjs-2';
 // import {
 //     Chart as ChartJS,
@@ -184,7 +184,16 @@ const MultipleResult = () => {
         } else if (businessDetails.value[businessDetails.value.length - 1].type == 'restaurant') {
             dispatch(addBusiness({ 'type': 'restaurant' }))
             navigate('/inputHotel');
+        } else if (businessDetails.value[businessDetails.value.length - 1].type == 'pharmacy') {
+            dispatch(addBusiness({ 'type': 'pharmacy' }))
+            navigate('/inputPharmacy');
         }
+        else if (businessDetails.value[businessDetails.value.length - 1].type == 'grocery') {
+            dispatch(addBusiness({ 'type': 'grocery' }))
+            navigate('/inputGrocery');
+        }
+        
+
 
 
     }
@@ -284,10 +293,10 @@ const MultipleResult = () => {
                                 <div className={classes.featureTitleTxt}>Location Based Features</div>
                                 <Box className={classes.featuresBox}>
                                     <Grow in={checked} style={{ transformOrigin: '0 0 0' }} {...(checked ? { timeout: 500 } : {})} >
-                                        <div className={classes.features}><LocationOnRoundedIcon style={{ color: '#df5e52' }} />Location Attractiveness Places  - {businessDetails.value[i].locationFeatures.attractionPlacesCount}</div>
+                                        <div className={classes.features}><LocationOnRoundedIcon style={{ color: '#df5e52' }} />Location Attractiveness Places  - {businessDetails.value[i].locationFeatures?.attractionPlacesCount}</div>
                                     </Grow>
                                     <Grow in={checked} style={{ transformOrigin: '0 0 0' }} {...(checked ? { timeout: 800 } : {})} >
-                                        <div className={classes.features}><DirectionsTransitFilledSharpIcon style={{ color: '#2f9f48' }} />Transportation Modes Count - {businessDetails.value[i].locationFeatures.transportationModesCount}</div>
+                                        <div className={classes.features}><DirectionsTransitFilledSharpIcon style={{ color: '#2f9f48' }} />Transportation Modes Count - {businessDetails.value[i].locationFeatures?.transportationModesCount}</div>
                                     </Grow>
                                     <Grow in={checked} style={{ transformOrigin: '0 0 0' }} {...(checked ? { timeout: 1100 } : {})} >
                                         <div className={classes.features}><ApartmentRoundedIcon style={{ color: '#ce7c39' }} />Nearby Hotel Count  - {businessDetails.value[i].locationFeatures.competitors}</div>
@@ -494,9 +503,6 @@ const MultipleResult = () => {
                     <div className={classes.addMoreBtnTxt} >Compare With Another Location</div>
 
                 </Box>
-
-
-
 
 
             </Box>

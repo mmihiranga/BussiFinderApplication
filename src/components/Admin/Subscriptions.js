@@ -86,12 +86,6 @@ const headCells = [
     id: "id",
     numeric: true,
     disablePadding: true,
-    label: "Subscription ID",
-  },
-  {
-    id: "uid",
-    numeric: false,
-    disablePadding: true,
     label: "User ID",
   },
   {
@@ -119,10 +113,22 @@ const headCells = [
     label: "Subscription End Date",
   },
   {
-    id: "subscriptionAmount",
+    id: "subscriptionEndDate",
     numeric: true,
     disablePadding: false,
-    label: "Subscription Amount",
+    label: "Subscription End Date",
+  },
+  {
+    id: "subscriptionEndDate",
+    numeric: true,
+    disablePadding: false,
+    label: "Subscription End Date",
+  },
+  {
+    id: "subscriptionEndDate",
+    numeric: true,
+    disablePadding: false,
+    label: "Subscription End Date",
   },
   {
     id: "subscriptionStatus",
@@ -280,7 +286,7 @@ const Subscriptions = () => {
 
   
   useEffect(() => {
-    api.get("/subscription/").then((response) => {
+    api.get("/user/").then((response) => {
       console.log(response.data);
       setRows(response.data);
     });
@@ -400,7 +406,6 @@ const Subscriptions = () => {
                       >
                         {row._id}
                       </TableCell>
-                      <TableCell align="center">{row.userID}</TableCell>
                       <TableCell align="center">{row.paymentID}</TableCell>
                       <TableCell align="center">{row.paymentType}</TableCell>
                       <TableCell align="center">
@@ -408,9 +413,6 @@ const Subscriptions = () => {
                       </TableCell>
                       <TableCell align="center">
                         {row.subscriptionEndDate}
-                      </TableCell>
-                      <TableCell align="center">
-                        {row.subscriptionAmount}
                       </TableCell>
                       <TableCell align="center">
                         {row.subscriptionStatus}

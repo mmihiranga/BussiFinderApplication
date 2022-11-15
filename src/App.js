@@ -13,6 +13,7 @@ import Map from './components/Map';
 import Loader from './components/Loader'
 import Footer from './components/Footer';
 import themeReducer from "./features/theme";
+import factorReducer from "./features/factorDetails";
 import businessReducer from "./features/business";
 import headerReducer from "./features/header";
 import userReducer from "./features/user";
@@ -27,15 +28,21 @@ import InputGroceryDetails from './components/InputGroceryDetails';
 import MultipleResult from './components/MultipleResult';
 import ResultsWOTypes from './components/ResultsWOTypes';
 import LocationBasedPredict from './components/LocationBasedPredict';
+import MultipleResultP from './components/PharmacyInputs/MultupleResultsP';
+import MultipleResultG from './components/Grocery Input/MultipleResultG'
 import FactorDetails from './components/FactorDetails';
 import AdminDashboard  from './components/Admin/AdminDashboard';
+import GroceryTips from './components/Grocery Input/groceryTips'
+import UserSubscriptionPlan from './components/User/UserSubscriptionPlan';
+import ResultsFD from './components/ResultsFD';
 
 const store = configureStore({
   reducer: {
     theme: themeReducer,
     business: businessReducer,
     header: headerReducer,
-    user: userReducer
+    user: userReducer,
+    factorDetails: factorReducer
   },
 });
 
@@ -63,8 +70,14 @@ function App() {
           <Route path="/resultWOTypes" element={<ResultsWOTypes/>} />
           <Route path="/Service" element={<BusinessTypePage />} />
           <Route path="/locationBasedPredict" element={<LocationBasedPredict />} />
-          <Route path="/Factor%20Details" element={<FactorDetails />} />
+          <Route path="/pmultipleResult" element={<MultipleResultP/>} />
+          <Route path="/multipleResultG" element={<MultipleResultG/>} />
           <Route path="/AdminDashboard" element={<AdminDashboard />} />
+          <Route path="/GroceryTips" element={<GroceryTips />} />
+          <Route path="/AreaAnalysis" element={<FactorDetails />} />
+          <Route path="/AdminDashboard" element={<AdminDashboard />} />
+          <Route path="/UserSubscriptionPlan" element={<UserSubscriptionPlan />} />
+          <Route path="/ResultsFactorDetails" element={<ResultsFD />} />
         </Route>
       </Routes>
       <Footer />

@@ -19,6 +19,7 @@ import { darkMode, lightMode } from "../features/theme";
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 function stringToColor(string) {
   let hash = 0;
@@ -88,7 +89,7 @@ const useStyles = makeStyles((theme) => ({
     padding: "10px 20px",
     cursor: "pointer",
     '&:hover': {
-      backgroundColor: themeColor => themeColor.status == 'dark' ? '#3e3d3d' : '#e3e3e3',
+      backgroundColor: themeColor => themeColor.status == 'dark' ? '#3e3d3d' : '#e3e3e3',cursor: "pointer",
     }
   },
   themeSwtich: {
@@ -100,6 +101,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function AccountMenu({ name, email, onLogOut }) {
+  let navigate = useNavigate();
   const themeColor = useSelector((state) => state.theme.value);
   const dispatch = useDispatch();
   const classes = useStyles(themeColor);
@@ -230,7 +232,9 @@ export default function AccountMenu({ name, email, onLogOut }) {
             Theme Mode<sup style={{ fontStyle: 'italic', fontSize: '12px', marginLeft: '-5px' , marginBottom: '-3px' }}>({themeColor.status})</sup> <Android12Switch sx={{ m: 1 }} checked={switchState} onChange={handleChange} />
           </div>
           <Divider sx={{ borderColor: '#b5b5b51f' }} />
-          <div className={classes.menuItems}>
+          <div className={classes.menuItems} 
+            onClick={() => {navigate('UserSubscriptionPlan')}}
+          >
             <ListItemIcon>
               <IoIosGitBranch style={{ color: '#956cd0', fontSize: "25px", marginLeft: 10 }} />
             </ListItemIcon>

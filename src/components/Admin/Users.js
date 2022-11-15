@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -22,6 +22,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
 import { Stack } from "@mui/system";
+import TextField from "@material-ui/core/TextField";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import SearchIcon from "@mui/icons-material/Search";
 import api from "../../api";
 import { Button } from "@mui/material";
 import { makeStyles } from "@mui/styles";
@@ -30,6 +33,10 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import AlertDialogSlide from "../AlertDialogSlide";
+import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
+import DATA from "../../assets/data/subscriptionPlan";
+import {ReportDownload} from "./ReportDownload";
+import { Report } from "@mui/icons-material";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -194,26 +201,42 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 function EnhancedTableToolbar({
-  numSelected,
+  selected,
   selectedUser,
   hasChanged,
   setHasChanged,
+  setToggle,
+  toggle,
+  setSearchTxt,
+  searchTxt,
 }) {
   const classes = useStyles();
   const [subPlan, setSubPlan] = React.useState("");
   const [subStatus, setSubStatus] = React.useState("");
   const [open, setOpen] = React.useState(false);
-  const [handleConfirm,setHandleConfirm] = React.useState(false);
+  const [handleConfirm, setHandleConfirm] = React.useState(false);
   const [titleBox, setTitleBox] = React.useState("");
-  const [contentBox,setContentBox] = React.useState("");
+  const [contentBox, setContentBox] = React.useState("");
+  const [apiName, setApiName] = React.useState("");
+  const [todayDate, setTodayDate] = React.useState("");
+  const [dataToReport, setDataToReport] = React.useState(false);
+
+  const getPlanInfo = (type) => {
+    let planInfo = DATA.filter((item) => item.plan === type);
+    return planInfo[0];
+  };
 
   useEffect(() => {
-    
-    if(selectedUser?.length==1){
+    setTodayDate(new Date().toISOString());
+    if (selected?.length === 1) {
       setSubPlan(selectedUser?.subscriptionPlan);
       setSubStatus(selectedUser?.subscriptionStatus);
     }
   }, [selectedUser]);
+
+  const handleSearch = (event) => {
+    setSearchTxt(event.target.value);
+  };
 
   const handleSubcriptionPlanChange = (event) => {
     setSubPlan(event.target.value);
@@ -226,33 +249,79 @@ function EnhancedTableToolbar({
   };
 
   const handleDelete = () => {
-    console.log(selectedUser?.length);
-    if(selectedUser?.length===1){
-      setTitleBox("Please Confrim")
+    if (selected?.length === 1) {
+      setTitleBox("Please Confrim");
       setContentBox("Are you sure you want to delete this user?");
-    }else{
-      setTitleBox("Please Confrim")
+    } else {
+      setTitleBox("Please Confrim");
       setContentBox("Are you sure you want to delete these users?");
     }
+    setApiName("deleteUser");
     setOpen(true);
   };
 
-  useMemo(() => {
-    if(handleConfirm){
-      for (let i = 0; i < selectedUser.length; i++) {
-      api.delete(`/user/${i._id}`).then((res) => {
-        console.log(res);
-      });
+  const handleUpdate = () => {
+    if (selected?.length === 1) {
+      setTitleBox("Please Confrim");
+      setContentBox("Are you sure you want to update this user?");
+    } else {
+      setTitleBox("Please Confrim");
+      setContentBox("Are you sure you want to update these users?");
     }
+    setApiName("updateUser");
+    setOpen(true);
+  };
+
+  const handleConfirmDailog = (Confirm) => {
+    if (Confirm) {
+      switch (apiName) {
+        case "deleteUser":
+          for (let i = 0; i < selected.length; i++) {
+            api.delete(`/user/${selected[i]}`).then((res) => {
+              console.log(res);
+              setHasChanged(false);
+              setToggle(!toggle);
+            });
+          }
+          break;
+        case "updateUser":
+          for (let i = 0; i < selected.length; i++) {
+            console.log("sfdsfd", todayDate);
+            const planInfo = getPlanInfo(subPlan);
+            api
+              .put(`/user/updateUser/`, {
+                id: selected[i],
+                subscriptionPlan: subPlan,
+                subscriptionDate: todayDate,
+                predictionCount: planInfo.count,
+                subscriptionStatus: subStatus,
+              })
+              .then((res) => {
+                console.log(res);
+                setHasChanged(false);
+                setToggle(!toggle);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }
+          break;
+        default:
+          break;
+      }
     }
-  }, [handleConfirm]);
+  };
+
+  const handleReport = () => {
+    setDataToReport(true);
+  };
 
   return (
     <Toolbar
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
+        ...(selected?.length > 0 && {
           bgcolor: (theme) =>
             alpha(
               theme.palette.primary.main,
@@ -261,18 +330,19 @@ function EnhancedTableToolbar({
         }),
       }}
     >
-      {numSelected > 0 ? (
+      {dataToReport && <ReportDownload ids={selected} setDataToReport={setDataToReport} />}
+      {selected?.length > 0 ? (
         <Typography
           sx={{ flex: "1 1 100%" }}
           color="inherit"
           variant="subtitle1"
           component="div"
         >
-          {numSelected} selected
+          {selected?.length} selected
         </Typography>
       ) : (
         <Typography
-          sx={{ flex: "1 1 100%" }}
+          sx={{ flex: "1 1 50%" }}
           variant="h6"
           id="tableTitle"
           component="div"
@@ -281,97 +351,129 @@ function EnhancedTableToolbar({
         </Typography>
       )}
 
-      {numSelected > 0 ? (
+      {selected?.length > 0 ? (
         <Stack direction="row">
-            <AlertDialogSlide open={open}  setOpen={setOpen} title={titleBox} content={contentBox} setHandleConfirm={setHandleConfirm}/>
-          {numSelected === 1 && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                width: "fit-content",
-                px: 2,
-                m: 1,
-                mx: 1,
-                gap: 1,
-                borderRadius: 1,
-                border: "1px solid #b6c3d9",
-              }}
-            >   
-            
-              <Box className={classes.itemBox}>
-                <div className={classes.labelTxt}>Subscription Date</div>
-                <div className={classes.detailsTxt}>
-                  {selectedUser?.subscriptionDate}
-                </div>
-              </Box>
-              <Box className={classes.itemBox}>
-                <div className={classes.labelTxt}>Subscription End Date</div>
-                <div className={classes.detailsTxt}>
-                  {selectedUser?.subscriptionEndDate}
-                </div>
-              </Box>
-              <Box className={classes.itemBox}>
-                <FormControl sx={{ m: 1, minWidth: 180 }} size="small">
-                  <InputLabel id="demo-simple-select-autowidth-label">
-                    Subscription Plan
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-autowidth-label"
-                    id="demo-simple-select-autowidth"
-                    value={subPlan}
-                    onChange={handleSubcriptionPlanChange}
-                    label="Subscription Plan"
-                    defaultValue={selectedUser?.subscriptionPlan}
-                  >
-                    <MenuItem value={"none"}>
-                      <em>None</em>
-                    </MenuItem>
-                    <MenuItem value={"none"}>Plan 1</MenuItem>
-                    <MenuItem value={20}>Plan 2</MenuItem>
-                    <MenuItem value={30}>Plan 3</MenuItem>
-                    <MenuItem value={40}>Plan 1 Year</MenuItem>
-                    <MenuItem value={50}>Plan 2 Year</MenuItem>
-                    <MenuItem value={60}>Plan 3 Year</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
-              <Box className={classes.itemBox}>
-                <FormControl sx={{ m: 1, minWidth: 180 }} size="small">
-                  <InputLabel id="demo-simple-select-autowidth-label">
-                    Subscription Status
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-autowidth-label"
-                    id="demo-simple-select-autowidth"
-                    value={subStatus}
-                    onChange={handleSubcriptionStatusChange}
-                    label="Subscription Status"
-                  >
-                    <MenuItem value={"none"}>
-                      <em>None</em>
-                    </MenuItem>
-                    <MenuItem value={"Active"}>Active</MenuItem>
-                    <MenuItem value={"Expired"}>Expired</MenuItem>
-                    <MenuItem value={"Over"}>Over</MenuItem>
-                    <MenuItem value={"Deactive"}>Deactive</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
-              <Button
-                variant="contained"
-                disabled={hasChanged ? false : true}
+          <AlertDialogSlide
+            open={open}
+            setOpen={setOpen}
+            title={titleBox}
+            content={contentBox}
+            handleConfirmDailog={handleConfirmDailog}
+          />
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              width: "fit-content",
+              px: 2,
+              m: 1,
+              mx: 1,
+              gap: 1,
+              borderRadius: 1,
+              border: "1px solid #b6c3d9",
+            }}
+          >
+            {selected?.length === 1 && (
+              <Box
                 sx={{
-                  textTransform: "none",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
                   width: "fit-content",
-                  whiteSpace: "nowrap",
+                  gap: 1,
                 }}
               >
-                Save Changes
-              </Button>
+                <Box className={classes.itemBox}>
+                  <div className={classes.labelTxt}>Subscription Date</div>
+                  <div className={classes.detailsTxt}>
+                    {selectedUser?.subscriptionDate}
+                  </div>
+                </Box>
+                <Box className={classes.itemBox}>
+                  <div className={classes.labelTxt}>Subscription End Date</div>
+                  <div className={classes.detailsTxt}>
+                    {selectedUser?.subscriptionEndDate}
+                  </div>
+                </Box>
+              </Box>
+            )}
+            <Box className={classes.itemBox}>
+              <FormControl sx={{ m: 1, minWidth: 180 }} size="small">
+                <InputLabel id="demo-simple-select-autowidth-label">
+                  Subscription Plan
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-autowidth-label"
+                  id="demo-simple-select-autowidth"
+                  value={subPlan}
+                  onChange={handleSubcriptionPlanChange}
+                  label="Subscription Plan"
+                  defaultValue={selectedUser?.subscriptionPlan}
+                >
+                  <MenuItem value={"Free"}>
+                    <em>Free</em>
+                  </MenuItem>
+                  <MenuItem value={"Basic"}>Basic</MenuItem>
+                  <MenuItem value={"Popular"}>Popular</MenuItem>
+                  <MenuItem value={"Premium"}>Premium</MenuItem>
+                  <MenuItem value={"Intro"}>Intro</MenuItem>
+                  <MenuItem value={"Pro"}>Pro</MenuItem>
+                  <MenuItem value={"Flash"}>Flash</MenuItem>
+                  <MenuItem value={"Ultra"}>Ultra</MenuItem>
+                </Select>
+              </FormControl>
             </Box>
-          )}
+            <Box className={classes.itemBox}>
+              <FormControl sx={{ m: 1, minWidth: 180 }} size="small">
+                <InputLabel id="demo-simple-select-autowidth-label">
+                  Subscription Status
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-autowidth-label"
+                  id="demo-simple-select-autowidth"
+                  value={subStatus}
+                  onChange={handleSubcriptionStatusChange}
+                  label="Subscription Status"
+                >
+                  <MenuItem value={"none"}>
+                    <em>None</em>
+                  </MenuItem>
+                  <MenuItem value={"Active"}>Active</MenuItem>
+                  <MenuItem value={"Expired"}>Expired</MenuItem>
+                  <MenuItem value={"Over"}>Over</MenuItem>
+                  <MenuItem value={"Deactivate"}>Deactivate</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+            <Button
+              onClick={() => handleUpdate(selectedUser.id)}
+              variant="contained"
+              disabled={hasChanged ? false : true}
+              sx={{
+                textTransform: "none",
+                width: "fit-content",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Save Changes
+            </Button>
+          </Box>
+          <Tooltip title="Filter list">
+            <IconButton
+              onClick={() => handleReport()}
+              sx={{
+                m: 1,
+                px: 1,
+                "&:hover": {
+                  borderRadius: 1,
+                },
+              }}
+            >
+              <DownloadRoundedIcon />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="Delete">
             <IconButton
               onClick={handleDelete}
@@ -388,21 +490,60 @@ function EnhancedTableToolbar({
           </Tooltip>
         </Stack>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            gap: 4,
+            px: 2,
+          }}
+        >
+          <TextField
+            fullWidth
+            id="fullWidth"
+            type="search"
+            variant="outlined"
+            margin="normal"
+            size="small"
+            borderRadius={2}
+            onChange={handleSearch}
+            value={searchTxt}
+            placeholder="Search using email"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Tooltip title="Filter list">
+            <IconButton onClick={() => handleReport()}>
+              <DownloadRoundedIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Filter list">
+            <IconButton>
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       )}
     </Toolbar>
   );
 }
 
 EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-  selectedUser: PropTypes.array.isRequired,
+  selected: PropTypes.array.isRequired,
+  selectedUser: PropTypes.object.isRequired,
   hasChanged: PropTypes.bool.isRequired,
   setHasChanged: PropTypes.func.isRequired,
+  setToggle: PropTypes.func.isRequired,
+  toggle: PropTypes.bool.isRequired,
+  searchTxt: PropTypes.string.isRequired,
+  setSearchTxt: PropTypes.func.isRequired,
 };
 
 const Users = () => {
@@ -413,16 +554,31 @@ const Users = () => {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [selectedUser, setSelectedUser] = React.useState(null);
+  const [selectedUser, setSelectedUser] = React.useState("");
   const [hasChanged, setHasChanged] = React.useState(false);
-
+  const [toggle, setToggle] = React.useState(false);
+  const [searchTxt, setSearchTxt] = React.useState("");
 
   useEffect(() => {
     api.get("/user/").then((response) => {
-      console.log(response.data);
       setRows(response.data);
     });
-  }, [hasChanged]);
+  }, [hasChanged, toggle]);
+
+  useEffect(() => {
+    if (searchTxt.length > 0) {
+      api
+        .get(`/user/search/${searchTxt}`)
+        .then((response) => {
+          setRows(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      setToggle(!toggle);
+    }
+  }, [searchTxt]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -434,7 +590,7 @@ const Users = () => {
     if (event.target.checked) {
       const newSelected = rows.map((n) => n._id);
       setSelected(newSelected);
-
+      setHasChanged(false);
       return;
     }
     setSelected([]);
@@ -492,10 +648,13 @@ const Users = () => {
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
         <EnhancedTableToolbar
-          numSelected={selected.length}
+          selected={selected}
           selectedUser={selectedUser}
           hasChanged={hasChanged}
           setHasChanged={setHasChanged}
+          setToggle={setToggle}
+          setSearchTxt={setSearchTxt}
+          searchTxt={searchTxt}
         />
         <TableContainer>
           <Table
@@ -593,7 +752,6 @@ const Users = () => {
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
       />
-    
     </Box>
   );
 };

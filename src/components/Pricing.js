@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React,{useEffect,useState} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { useNavigate } from "react-router-dom";
@@ -13,21 +13,21 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-
+import DATA from '../assets/data/subscriptionPlan';
 
 
 const PlanButton = styled(Button)(({ theme }) => ({
     width:"170px",
     marginTop:"20px",
     // backgroundColor:'#fff5fb',
-    color:'#F496D1',
+    color:'#cccbd4',
     borderRadius:'30px',
     textTransform:'none',
     fontSize:'12px',
     boxSizing:'border-box',
     alignSelf:'center',
     paddingBlock:'8px',
-    background: 'linear-gradient(to left, #fff5fb 50%, #ffd7ef 50%) right',
+    background: 'linear-gradient(to left, #363c81 50%, #2d2955 50%) right',
     backgroundSize: '200%',
     transition: '.5s ease-out',
     '&:hover': {
@@ -195,6 +195,121 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function MonthlyPlanRender  () {
+  const classes = useStyles();
+  const navigate = useNavigate();
+  const userInfo = useSelector((state) => state.user.userDetails);
+  
+
+  const handleUpdgradePlan = (type) => {
+    console.log("handleUpdgradePlan",type);
+  }
+  const handleChoosePlan = (type) => {
+    console.log("handleChoosePlan",type);
+    navigate('/UserSubscriptionPlan')
+  }
+  return (
+    
+ 
+      DATA.map((item, index) => (
+        item.type === "month" && (
+      <Box key={index} >
+      {item.plan ==="Popular"? 
+     <Box className={classes.pricingBoxMost} >
+     <div className={classes.popularTxtMost}>Most popular</div>
+     <div className={classes.priceMonthTxtMost}><span className={classes.priceTxtMost} >{item.price}$</span> /{item.type}</div>
+     <div className={classes.planTypeTxtMost}>{item.plan}</div>
+     <div className={classes.planDescTxtMost}>{item.description}</div>
+     {item.features.map((feature, i) => (
+     <div className={classes.planItemsMost} key={i}>
+       <FiCheck className={classes.planIconMost}/><div className={classes.planItemTxtMost}>{feature}</div>
+     </div>
+  ))}
+      
+     <MostPlanButton
+       onClick={()=>userInfo.subscriptionPlan === item.plan ? handleChoosePlan(item.plan) : handleUpdgradePlan(item.type)}
+     >{userInfo.subscriptionPlan === item.plan ? 'Current Plan' :'Upgrade Plan'} </MostPlanButton>
+   </Box>
+       : 
+       <Box className={classes.pricingBox} >
+       <div className={classes.priceMonthTxt}><span className={classes.priceTxt} >{item.price}$</span> /{item.type}</div>
+       <div className={classes.planTypeTxt}>{item.plan}</div>
+       <div className={classes.planDescTxt}>{item.description}</div>
+       {item.features.map((feature, i) => (
+     <div className={classes.planItems}>
+     <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>{feature}</div>
+   </div>
+  ))}
+       <PlanButton
+        onClick={()=>userInfo.subscriptionPlan === item.plan ? handleChoosePlan(item.plan) : handleUpdgradePlan(item.type)}
+        >{userInfo.subscriptionPlan === item.plan ? 'Current Plan' :'Upgrade Plan'} </PlanButton>
+     </Box>
+      
+      }
+      </Box>
+      )))
+    
+  );
+}
+
+
+
+function YearlyPlanRender  () {
+  const classes = useStyles();
+  const userInfo = useSelector((state) => state.user.userDetails);
+
+
+  const handleUpdgradePlan = (type) => {
+    console.log("handleUpdgradePlan",type);
+  }
+  const handleChoosePlan = (type) => {
+    console.log("handleChoosePlan",type);
+  }
+  return (
+    
+ 
+      DATA.map((item, index) => (
+      item.type === "year" && (
+    <Box key={index} 
+        
+    >
+      {item.plan ==="Flash"? 
+     <Box className={classes.pricingBoxMost} >
+     <div className={classes.popularTxtMost}>Most popular</div>
+     <div className={classes.priceMonthTxtMost}><span className={classes.priceTxtMost} >{item.price}$</span> /{item.type}</div>
+     <div className={classes.planTypeTxtMost}>{item.plan}</div>
+     <div className={classes.planDescTxtMost}>{item.description}</div>
+     {item.features.map((feature, i) => (
+     <div className={classes.planItemsMost} key={i}>
+       <FiCheck className={classes.planIconMost}/><div className={classes.planItemTxtMost}>{feature}</div>
+     </div>
+  ))}
+     <MostPlanButton
+     onClick={()=>userInfo.subscriptionPlan === item.plan ? handleChoosePlan(item.plan) : handleUpdgradePlan(item.type)}
+     >{userInfo.subscriptionPlan === item.plan ? 'Current Plan' :'Upgrade Plan'} </MostPlanButton>
+   </Box>
+       : 
+       <Box className={classes.pricingBox}  >
+       <div className={classes.priceMonthTxt}><span className={classes.priceTxt} >{item.price}$</span> /{item.type}</div>
+       <div className={classes.planTypeTxt}>{item.plan}</div>
+       <div className={classes.planDescTxt}>{item.description}</div>
+       {item.features.map((feature, i) => (
+     <div className={classes.planItems}>
+     <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>{feature}</div>
+   </div>
+  ))}
+       <PlanButton
+        onClick={()=>userInfo.subscriptionPlan === item.plan ? handleChoosePlan(item.plan) : handleUpdgradePlan(item.type)}
+        >{userInfo.subscriptionPlan === item.plan ? 'Current Plan' :'Upgrade Plan'} </PlanButton>
+     </Box>
+      
+      }
+      </Box>
+      )))
+    
+  );
+}
+
 const Pricing = () => {
   const themeColor = useSelector((state) => state.theme.value);
   const dispatch = useDispatch();
@@ -216,7 +331,8 @@ const Pricing = () => {
       width:'fit-content',
       backgroundColor:'#E4E6F1',
       padding:'2rem',
-      paddingInline:'13rem',
+      paddingInline:'7rem',
+      paddingBlock:'5rem',
       boxSizing:'border-box',
 
     }}
@@ -284,93 +400,21 @@ const Pricing = () => {
       </Box>
       <TabPanel value="1">
       <Box sx={{
-        display:'flex',
-        alignItems:'center',
-        justifyContent:'center',
-        padding:'45px',
-        backgroundColor:'#FFFFFF',
-        width:"100%",
-        height:'100%',
-        borderRadius:'1rem',
-        boxSizing:'border-box',
-        gap:'10px',
+      display:'flex',
+      alignItems:'center',
+      justifyContent:'center',
+      padding:'45px',
+      backgroundColor:'#FFFFFF',
+      width:"100%",
+      height:'100%',
+      borderRadius:'1rem',
+      boxSizing:'border-box',
+      gap:'10px',
 
 
-      }}>
-        <Box className={classes.pricingBox}>
-          <div className={classes.priceMonthTxt}><span className={classes.priceTxt} >20$</span> /month</div>
-          <div className={classes.planTypeTxt}>Intro</div>
-          <div className={classes.planDescTxt}>For most businesses that want to otpimize web queries</div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <PlanButton> Choose Plan </PlanButton>
-        </Box>
-        <Box className={classes.pricingBox} >
-          <div className={classes.priceMonthTxt}><span className={classes.priceTxt} >20$</span> /month</div>
-          <div className={classes.planTypeTxt}>Intro</div>
-          <div className={classes.planDescTxt}>For most businesses that want to otpimize web queries</div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <PlanButton> Choose Plan </PlanButton>
-        </Box>
-        <Box className={classes.pricingBoxMost} >
-          <div className={classes.popularTxtMost}>Most popular</div>
-          <div className={classes.priceMonthTxtMost}><span className={classes.priceTxtMost} >100$</span> /month</div>
-          <div className={classes.planTypeTxtMost}>Pro</div>
-          <div className={classes.planDescTxtMost}>For most businesses that want to otpimize web queries</div>
-          <div className={classes.planItemsMost}>
-            <FiCheck className={classes.planIconMost}/><div className={classes.planItemTxtMost}>Free forever</div>
-          </div>
-          <div className={classes.planItemsMost}>
-            <FiCheck className={classes.planIconMost}/><div className={classes.planItemTxtMost}>Free forever</div>
-          </div>
-          <div className={classes.planItemsMost}>
-            <FiCheck className={classes.planIconMost}/><div className={classes.planItemTxtMost}>Free forever</div>
-          </div>
-          <div className={classes.planItemsMost}>
-            <FiCheck className={classes.planIconMost}/><div className={classes.planItemTxtMost}>Free forever</div>
-          </div>
-          <MostPlanButton> Choose Plan </MostPlanButton>
-        </Box>
-        <Box className={classes.pricingBox} >
-          <div className={classes.priceMonthTxt}><span className={classes.priceTxt} >20$</span> /month</div>
-          <div className={classes.planTypeTxt}>Intro</div>
-          <div className={classes.planDescTxt}>For most businesses that want to otpimize web queries</div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <div className={classes.planItems}>
-            <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-          </div>
-          <PlanButton> Choose Plan </PlanButton>
-        </Box>
-      </Box>
+    }}> <MonthlyPlanRender /></Box>
+       
+     
         </TabPanel>
         <TabPanel value="2">
             <Box sx={{
@@ -387,79 +431,7 @@ const Pricing = () => {
 
 
           }}>
-            <Box className={classes.pricingBox}>
-              <div className={classes.priceMonthTxt}><span className={classes.priceTxt} >20$</span> /year</div>
-              <div className={classes.planTypeTxt}>Intro</div>
-              <div className={classes.planDescTxt}>For most businesses that want to otpimize web queries</div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <PlanButton> Choose Plan </PlanButton>
-            </Box>
-            <Box className={classes.pricingBox} >
-              <div className={classes.priceMonthTxt}><span className={classes.priceTxt} >20$</span> /year</div>
-              <div className={classes.planTypeTxt}>Intro</div>
-              <div className={classes.planDescTxt}>For most businesses that want to otpimize web queries</div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <PlanButton> Choose Plan </PlanButton>
-            </Box>
-            <Box className={classes.pricingBoxMost} >
-              <div className={classes.popularTxtMost}>Most popular</div>
-              <div className={classes.priceMonthTxtMost}><span className={classes.priceTxtMost} >100$</span> /year</div>
-              <div className={classes.planTypeTxtMost}>Pro</div>
-              <div className={classes.planDescTxtMost}>For most businesses that want to otpimize web queries</div>
-              <div className={classes.planItemsMost}>
-                <FiCheck className={classes.planIconMost}/><div className={classes.planItemTxtMost}>Free forever</div>
-              </div>
-              <div className={classes.planItemsMost}>
-                <FiCheck className={classes.planIconMost}/><div className={classes.planItemTxtMost}>Free forever</div>
-              </div>
-              <div className={classes.planItemsMost}>
-                <FiCheck className={classes.planIconMost}/><div className={classes.planItemTxtMost}>Free forever</div>
-              </div>
-              <div className={classes.planItemsMost}>
-                <FiCheck className={classes.planIconMost}/><div className={classes.planItemTxtMost}>Free forever</div>
-              </div>
-              <MostPlanButton> Choose Plan </MostPlanButton>
-            </Box>
-            <Box className={classes.pricingBox} >
-              <div className={classes.priceMonthTxt}><span className={classes.priceTxt} >20$</span> /year</div>
-              <div className={classes.planTypeTxt}>Intro</div>
-              <div className={classes.planDescTxt}>For most businesses that want to otpimize web queries</div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <div className={classes.planItems}>
-                <FiCheck className={classes.planIcon}/><div className={classes.planItemTxt}>Free forever</div>
-              </div>
-              <PlanButton> Choose Plan </PlanButton>
-            </Box>
+           <YearlyPlanRender/>
           </Box>
         </TabPanel>
       </TabContext>

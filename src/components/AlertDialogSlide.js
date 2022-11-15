@@ -12,19 +12,20 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AlertDialogSlide({ open, setOpen, title, content, setHandleConfirm }) {
+export default function AlertDialogSlide({ open, setOpen, title, content, handleConfirmDailog }) {
 //   const [open, setOpen] = React.useState(false);
 
 
   const handleCloseConfrim = () => {
+    handleConfirmDailog(true);
     setOpen(false);
 
-    setHandleConfirm(true);
+   
 
   };
   const handleClose = () => {
+    handleConfirmDailog(false);
     setOpen(false);
-    setHandleConfirm(false);
 
   };
 
@@ -37,9 +38,17 @@ export default function AlertDialogSlide({ open, setOpen, title, content, setHan
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{title}</DialogTitle>
+        <DialogTitle sx={{
+            color: "#231D4F",
+            fontSize: "20px",
+            fontWeight: "600",
+            whiteSpace: "nowrap",
+        }}>{title}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
+          <DialogContentText id="alert-dialog-slide-description" sx={{color: "#888888",
+    fontSize: "14px",
+    fontWeight: "400",
+   }}>
             {content}
           </DialogContentText>
         </DialogContent>
@@ -57,5 +66,5 @@ AlertDialogSlide.propTypes = {
   setOpen: PropTypes.func,
   title: PropTypes.string,
   content: PropTypes.string,
-  setHandleConfirm: PropTypes.func,
+  handleConfirmDailog: PropTypes.func,
 }

@@ -26,6 +26,7 @@ import Dashboard from './Dashboard';
 import Subscriptions from './Subscriptions';
 import {TfiUser} from 'react-icons/tfi';
 import {BsColumns} from 'react-icons/bs';
+import { Logout } from '@mui/icons-material';
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -126,6 +127,11 @@ const AdminDashboard = () => {
     dispatch(addHeader({ 'header': false, 'footer': false }))
 }, []);
 
+const onLogOut = () => {
+  localStorage.removeItem('token');
+  dispatch(Logout());
+}
+
   return (
     <Box sx={{ display: "flex" ,boxSizing:'border-box'}}>
       <CssBaseline />
@@ -206,7 +212,7 @@ const AdminDashboard = () => {
                 >
                   <IoLogOutOutline/>
                 </ListItemIcon>
-                <ListItemText primary={"Logout"} sx={{ opacity: open ? 1 : 0 }} />
+                <ListItemText primary={"Logout"} sx={{ opacity: open ? 1 : 0 }} onClick={onLogOut} />
               </ListItemButton>
             </ListItem>
         </List>
